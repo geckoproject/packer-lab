@@ -4,8 +4,8 @@
       "vcs":false
    },
    "variables":{  
-      "atlas_username":"ATLAS-USERNAME",
-      "atlas_name":"BUILD-NAME",
+      "atlas_username":"sknight",
+      "atlas_name":"exbuild",
       "version":"1.0"
    },
    "builders":[  
@@ -40,7 +40,6 @@
          "disk_size":20480,
          "guest_os_type":"RedHat_64",
          "vboxmanage":[  
-            [  
             ["modifyvm", "{{.Name}}", "--memory", "1024"],
             ["modifyvm", "{{.Name}}", "--cpus", "1"]
          ],
