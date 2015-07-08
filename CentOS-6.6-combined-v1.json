@@ -4,11 +4,34 @@
       "vcs": false
     },
     "variables": {
-        "atlas_username": "YOUR-USERNAME",
-        "atlas_name": "YOUR-ATLAS-NAME",
+        "atlas_username": "sknight",
+        "atlas_name": "exbuild",
         "version": "1.0"
     },
     "builders": [
+    
+    	{
+  			"type": "amazon-ebs",
+  			"access_key": "AKIAIEUDEIOY3BK6SVYA",
+  			"secret_key": "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",
+  			"vpc_id": "vpc-bd2f00d8",
+    		"subnet_id": "subnet-95e78ccc",
+  			"region": "us-east-1",
+  			"source_ami": "ami-dbea24b0",
+  			"instance_type": "m1.small",
+  			"availability_zone": "us-east-1a",
+  			"ssh_username": "root",
+  			"ssh_keypair_name": "bosh-controller_AWS",
+  			"ssh_private_key_file": "/Users/knight/.ssh/aws.key",
+  			"security_group_id": "sg-1927357d",
+  			"associate_public_ip_address": true,
+  			"ami_name": "packer-centos-6.6-x86_64-{{timestamp}}",
+  			"tags": {
+    		"OS_Version": "CentOS",
+    		"Release": "6.6"
+    		}
+  			},
+  
 
         {
             "type": "virtualbox-iso",
@@ -92,6 +115,16 @@
                 "provider": "virtualbox",
                 "version": "0.0.1"
             }
+        },
+        {
+            "type": "atlas",
+            "only": ["amazon-ebs"],
+            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+            "artifact_type": "amazon.ami",
+            "metadata": {
+                "provider": "Amazon AMI",
+                "version": "0.0.1"
+            }
         }
         ]
     ],
@@ -100,23 +133,29 @@
         "type": "shell",
         "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
         "scripts": [
-            "scripts/vagrant.sh",
-            "scripts/compact.sh",
-            "scripts/cleanup.sh",
-            "scripts/zerodisk.sh"
+            "scripts/vagrant.sh"
         ],
         "override": {
                 "virtualbox-iso": {
                     "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
                     "scripts": [
-            		"scripts/vboxguest.sh"
+            		"scripts/vboxguest.sh",
+            		"scripts/compact.sh",
+            		"scripts/cleanup.sh",
+            		"scripts/zerodisk.sh"
         			]
                 },
                 "vmware-iso": {
                     "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
                     "scripts": [
-            		"scripts/vmware.sh"
+            		"scripts/vmware.sh",
+            		"scripts/compact.sh",
+            		"scripts/cleanup.sh",
+            		"scripts/zerodisk.sh"
         			]
+                },
+                "amazon-ebs": {
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
                 }
             }
         
