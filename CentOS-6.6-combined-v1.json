@@ -12,23 +12,23 @@
     
     	{
   			"type": "amazon-ebs",
-  			"access_key": "AKIAIEUDEIOY3BK6SVYA",
-  			"secret_key": "Hw/DpspwSXZZm3gVD761Jk8oN8s5r/GqSjEO/AOL",
-  			"vpc_id": "vpc-bd2f00d8",
-    		"subnet_id": "subnet-95e78ccc",
+  			"access_key": "YOUR-ACCESS-KEY",
+  			"secret_key": "YOUR-SECRET-KEY",
+  			"vpc_id": "DEFAULT-VPC-ID",
+    			"subnet_id": "SUBNET-ID",
   			"region": "us-east-1",
   			"source_ami": "ami-dbea24b0",
   			"instance_type": "m1.small",
   			"availability_zone": "us-east-1a",
   			"ssh_username": "root",
-  			"ssh_keypair_name": "bosh-controller_AWS",
-  			"ssh_private_key_file": "/Users/knight/.ssh/aws.key",
-  			"security_group_id": "sg-1927357d",
+  			"ssh_keypair_name": "PREDEFINED-KEYPAIR",
+  			"ssh_private_key_file": "PATH-TO-KEY-PAIR",
+  			"security_group_id": "sg-ID",
   			"associate_public_ip_address": true,
   			"ami_name": "packer-centos-6.6-x86_64-{{timestamp}}",
   			"tags": {
-    		"OS_Version": "CentOS",
-    		"Release": "6.6"
+    				"OS_Version": "CentOS",
+    				"Release": "6.6"
     		}
   			},
   
