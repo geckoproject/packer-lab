@@ -1,0 +1,130 @@
+{
+    "push": {
+      "name": "",
+      "vcs": false
+    },
+    "variables": {
+        "atlas_username": "sknight",
+        "atlas_name": "exbuild",
+        "version": "1.0"
+    },
+    "builders": [
+
+        {
+            "type": "virtualbox-iso",
+            "boot_command": [
+                "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6-x86_64/ks.cfg<enter><wait>"
+            ],
+            "headless": false,
+            "boot_wait": "10s",
+            "disk_size": 20480,
+            "guest_os_type": "RedHat_64",
+            "vboxmanage": [
+            ["modifyvm", "{{.Name}}", "--memory", "1024"],
+            ["modifyvm", "{{.Name}}", "--cpus", "1"]
+            ],
+            "http_directory": "http",
+            "iso_checksum": "4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
+            "iso_checksum_type": "sha1",
+            "iso_url": "http://mirrors.kernel.org/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso",
+            "ssh_username": "vagrant",
+            "ssh_password": "vagrant",
+            "ssh_port": 22,
+            "ssh_wait_timeout": "10000s",
+            "shutdown_command": "echo '/sbin/halt -h -p' > shutdown.sh; echo 'vagrant'|sudo -S bash 'shutdown.sh'",
+            "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+            "virtualbox_version_file": ".vbox_version"
+            
+        },
+          
+        {
+      		"type": "vmware-iso",
+      		"boot_command": [
+        	"<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6-x86_64/ks.cfg<enter><wait>"
+      		],
+      		"boot_wait": "10s",
+      		"disk_size": 20480,
+      		"guest_os_type": "centos-64",
+      		"headless": false,
+      		"http_directory": "http",
+      		"iso_urls": [
+        	"iso/CentOS-6.6-x86_64-minimal.iso",
+        	"http://mirrors.kernel.org/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso"
+      		],
+      		"iso_checksum_type": "sha1",
+      		"iso_checksum": "4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
+      		"ssh_username": "vagrant",
+      		"ssh_password": "vagrant",
+      		"ssh_port": 22,
+      		"ssh_wait_timeout": "10000s",
+      		"shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
+      		"tools_upload_flavor": "linux",
+      		"vm_name": "packer-centos-6.6-x86_64",
+      		"vmx_data": {
+        	"cpuid.coresPerSocket": "1",
+        	"memsize": "1024",
+        	"numvcpus": "1"
+      		}
+    	}
+    	
+    ],
+"post-processors": [
+        [{
+            "type": "vagrant",
+            "keep_input_artifact": false
+        },
+        {
+            "type": "atlas",
+            "only": ["vmware-iso"],
+            "artifact": "sknight/exbuild",
+            "artifact_type": "vagrant.box",
+            "metadata": {
+                "provider": "vmware_desktop",
+                "version": "0.0.1"
+            }
+        },
+        {
+            "type": "atlas",
+            "only": ["virtualbox-iso"],
+            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
+            "artifact_type": "vagrant.box",
+            "metadata": {
+                "provider": "virtualbox",
+                "version": "0.0.1"
+            }
+        }
+        ]
+    ],
+    "provisioners": [
+        {
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+        "scripts": [
+            "scripts/vagrant.sh",
+            "scripts/vboxguest.sh",
+            "scripts/vmware.sh",
+            "scripts/compact.sh",
+            "scripts/cleanup.sh",
+            "scripts/zerodisk.sh"
+        ],
+        "override": {
+                "virtualbox-iso": {
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
+                },
+                "vmware-iso": {
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
+                }
+            }
+        
+    },
+    {
+      "type": "puppet-masterless",
+      "execute_command": "{{.FacterVars}}{{if .Sudo}} echo 'vagrant' | sudo -E -S {{end}} puppet apply --verbose --modulepath='{{.ModulePath}}' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
+      "manifest_file": "puppet/manifests/docker.pp",
+      "manifest_dir": "puppet/manifests",
+      "module_paths": [
+        "puppet/modules"
+      ] 
+    }
+    ]
+}
