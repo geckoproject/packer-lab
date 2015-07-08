@@ -4,8 +4,8 @@
       "vcs":false
    },
    "variables":{  
-      "atlas_username":"sknight",
-      "atlas_name":"exbuild",
+      "atlas_username":"YOUR-ATLAS-USERNAME",
+      "atlas_name":"YOUR-ATLAS-BUILD-NAME",
       "version":"1.0"
    },
    "builders":[  
