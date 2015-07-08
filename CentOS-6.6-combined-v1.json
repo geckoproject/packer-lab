@@ -65,10 +65,7 @@
          "guest_os_type":"centos-64",
          "headless":false,
          "http_directory":"http",
-         "iso_urls":[  
-            "iso/CentOS-6.6-x86_64-minimal.iso",
-            "http://mirrors.kernel.org/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso"
-         ],
+         "iso_url":"http://mirrors.kernel.org/centos/6.6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso",
          "iso_checksum_type":"sha1",
          "iso_checksum":"4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
          "ssh_username":"vagrant",
