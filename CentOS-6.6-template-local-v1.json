@@ -74,18 +74,22 @@
         "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
         "scripts": [
             "scripts/vagrant.sh",
-            "scripts/vboxguest.sh",
-            "scripts/vmware.sh",
             "scripts/compact.sh",
             "scripts/cleanup.sh",
             "scripts/zerodisk.sh"
         ],
         "override": {
                 "virtualbox-iso": {
-                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
+                    "scripts": [
+            				"scripts/vboxguest.sh"
+        					]
                 },
                 "vmware-iso": {
-                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
+                    "scripts": [
+            				"scripts/vmware.sh"
+        					]
                 }
             }
         

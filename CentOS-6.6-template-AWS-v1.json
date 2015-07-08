@@ -1,15 +1,8 @@
 {
-    "push": {
-      "name": "",
-      "vcs": false
-    },
     "variables": {
-        "atlas_username": "YOUR-USERNAME",
-        "atlas_name": "YOUR-ATLAS-NAME",
-        "version": "1.0"
-    },
+    "version": "1.0"
+  	},
     "builders": [
-
         {
             "type": "virtualbox-iso",
             "boot_command": [
@@ -65,68 +58,80 @@
         	"memsize": "1024",
         	"numvcpus": "1"
       		}
-    	}
-    	
+    	},
+    		{
+  			"type": "amazon-ebs",
+  			"access_key": "xxx",
+  			"secret_key": "xxx",
+  			"vpc_id": "xxx",
+    			"subnet_id": "xxx",
+  			"region": "us-east-1",
+  			"source_ami": "xxx",
+  			"instance_type": "m1.small",
+  			"availability_zone": "us-east-1a",
+  			"ssh_username": "root",
+  			"ssh_keypair_name": "xxx",
+  			"ssh_private_key_file": "xxx",
+  			"security_group_id": "xxx",
+  			"associate_public_ip_address": true,
+  			"ami_name": "packer-centos-6.6-x86_64-{{timestamp}}",
+  			"tags": {
+    				"OS_Version": "CentOS",
+    				"Release": "6.6"
+  			},
+  			"ami_block_device_mappings": [
+    		{
+      			"device_name": "/dev/sdb",
+      			"virtual_name": "ephemeral0"
+    		}
+  ]
+}	
     ],
-"post-processors": [
-        [{
-            "type": "vagrant",
-            "keep_input_artifact": false
-        },
-        {
-            "type": "atlas",
-            "only": ["vmware-iso"],
-            "artifact": "sknight/exbuild",
-            "artifact_type": "vagrant.box",
-            "metadata": {
-                "provider": "vmware_desktop",
-                "version": "0.0.1"
-            }
-        },
-        {
-            "type": "atlas",
-            "only": ["virtualbox-iso"],
-            "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
-            "artifact_type": "vagrant.box",
-            "metadata": {
-                "provider": "virtualbox",
-                "version": "0.0.1"
-            }
-        }
-        ]
+    "post-processors": [
+       {
+       "type": "vagrant",
+       "compression_level": 9,
+       "output": "build/{{.BuildName}}-{{.Provider}}-{{user `version`}}.box"
+       }
     ],
     "provisioners": [
         {
         "type": "shell",
         "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
         "scripts": [
-            "scripts/vagrant.sh",
-            "scripts/compact.sh",
-            "scripts/cleanup.sh",
-            "scripts/zerodisk.sh"
+            "scripts/vagrant.sh"
         ],
         "override": {
                 "virtualbox-iso": {
                     "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
                     "scripts": [
-            		"scripts/vboxguest.sh"
+            		"scripts/vboxguest.sh",
+            		"scripts/compact.sh",
+            		"scripts/cleanup.sh",
+            		"scripts/zerodisk.sh"
         			]
                 },
                 "vmware-iso": {
                     "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
                     "scripts": [
-            		"scripts/vmware.sh"
+            		"scripts/vmware.sh",
+            		"scripts/compact.sh",
+            		"scripts/cleanup.sh",
+            		"scripts/zerodisk.sh"
         			]
+                },
+                "amazon-ebs": {
+                    "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'"
                 }
             }
         
     },
     {
-      "type": "puppet-masterless",
-      "execute_command": "{{.FacterVars}}{{if .Sudo}} echo 'vagrant' | sudo -E -S {{end}} puppet apply --verbose --modulepath='{{.ModulePath}}' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
-      "manifest_file": "puppet/manifests/docker.pp",
-      "manifest_dir": "puppet/manifests",
-      "module_paths": [
+      	"type": "puppet-masterless",
+      	"execute_command": "{{.FacterVars}}{{if .Sudo}} echo 'vagrant' | sudo -E -S {{end}} puppet apply --verbose --modulepath='{{.ModulePath}}' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
+      	"manifest_file": "puppet/manifests/docker.pp",
+      	"manifest_dir": "puppet/manifests",
+      	"module_paths": [
         "puppet/modules"
       ] 
     }
