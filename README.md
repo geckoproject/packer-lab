@@ -1,4 +1,4 @@
-# [Packer](http://packer.io) templates for Linux deployments
+# [Packer](http://packer.io) templates for Linux deployments to [Atlas] (https://atlas.hashicorp.com)
 
 ### Table of contents
 
@@ -29,23 +29,19 @@ In order to deploy artifacts to Atlas, you have to:
 
 4. Install packer
 
-5. Install VirtualBox and/or VMware Fusion
+5. Execute "packer build CentOS-6.6-xxx.json" (the version xxx-atlas provision in the Atlas portal online)
 
-6. Execute "packer build CentOS-6.6-xxx.json"
-
-7. This builds in both VirtualBox and VMware Fusion, to specify one build only you can also run: 
-
-- "packer build --only=vmware-iso CentOS-6.6-xxx.json" (other options are amazon-ebs and virtualbox-iso)
+7. This builds in AWS, VirtualBox and VMware Fusion 
 
 - If you want to run this but not deploy the artifacts to Atlas, simply run v2 of the json file: 
   "packer build CentOS-6.6-template-local-v2.json" 
   (This will drop your final build in the builds folder on your local machine)
-
+- As a side note, running "packer build --only=vmware-iso CentOS-6.6-xxx.json" (other options are amazon-ebs and virtualbox-iso) for local installs
 
 ### Prerequisites
 
 - A deployment of [Packer](http://packer.io)
-- A deployment of [VirtualBox](https://virtualbox.org) or [VMware Fusion] (http://www.vmware.com/products/fusion/)
+- A deployment of [VirtualBox](https://virtualbox.org) or [VMware Fusion] (http://www.vmware.com/products/fusion/) once you decide to "vagrant init YOUR-ACCOUNT/YOUR-BUILD; vagrant up --provider vmware_desktop|virtualbox"
 - An account on [AWS] if you wish to use the EBS interface (http://aws.amazon.com/)
 - Full instructions for installing Packer can be found at https://packer.io/docs/installation.html
 
