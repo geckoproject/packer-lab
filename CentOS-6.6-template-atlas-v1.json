@@ -21,7 +21,7 @@
       "aws_secret_key": "YOUR-SECRET-KEY",
       "aws_source_ami": "YOUR-AMI-ID",
       "aws_instance_type": "m1.small",
-      "aws_region": "us-east-1"
+      "aws_region": "us-east-1",
       "aws_ssh_keypair": "SSH-KEYPAIR-ASSIGNED-IN-AWS-CONSOLE",
       "aws_ssh_keyfile": "PATH-TO-PRIV-KEY-ON-DISK"
       
