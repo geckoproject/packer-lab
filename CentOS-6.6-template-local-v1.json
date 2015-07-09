@@ -1,7 +1,21 @@
-{  
-   "variables":{  
-      "version":"1.0"
+{
+    "push":{  
+      "name":"Packer (local build) build-{{timestamp}}",
+      "vcs":false
    },
+  
+   "variables":{
+   
+      "_comment": "Please define all variables here as a cleaner way to populate the vm configuration...",   
+      "_comment": "It saves duplication and confusion.",
+        
+      "version":"1.0",
+      "vm_cpu": "1",
+      "vm_ram": "1024",
+      "vm_disk": "20480"
+      
+   },
+   
    "builders":[  
       {  
          "type":"virtualbox-iso",
@@ -10,11 +24,11 @@
          ],
          "headless":false,
          "boot_wait":"10s",
-         "disk_size":20480,
+         "disk_size":"{{user `vm_disk`}}",
          "guest_os_type":"RedHat_64",
          "vboxmanage":[  
-                ["modifyvm", "{{.Name}}", "--memory", "1024"],
-                ["modifyvm", "{{.Name}}", "--cpus", "1"]
+                ["modifyvm", "{{.Name}}", "--memory", "{{user `vm_ram`}}"],
+                ["modifyvm", "{{.Name}}", "--cpus", "{{user `vm_cpu`}}"]
             ],
          "http_directory":"http",
          "iso_checksum":"4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
@@ -28,13 +42,14 @@
          "guest_additions_path":"VBoxGuestAdditions_{{.Version}}.iso",
          "virtualbox_version_file":".vbox_version"
       },
+      
       {  
          "type":"vmware-iso",
          "boot_command":[  
             "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6-x86_64/ks.cfg<enter><wait>"
          ],
          "boot_wait":"10s",
-         "disk_size":20480,
+         "disk_size":"{{user `vm_disk`}}",
          "guest_os_type":"centos-64",
          "headless":false,
          "http_directory":"http",
@@ -49,12 +64,13 @@
          "tools_upload_flavor":"linux",
          "vm_name":"packer-centos-6.6-x86_64",
          "vmx_data":{  
-            "cpuid.coresPerSocket":"1",
-            "memsize":"1024",
-            "numvcpus":"1"
+            "cpuid.coresPerSocket":"{{user `vm_cpu`}}",
+            "memsize":"{{user `vm_ram`}}",
+            "numvcpus":"{{user `vm_cpu`}}"
          }
       }
    ],
+   
    "post-processors":[  
       {  
          "type":"vagrant",
@@ -62,6 +78,7 @@
          "output":"build/{{.BuildName}}-{{.Provider}}-{{user `version`}}.box"
       }
    ],
+   
    "provisioners":[  
       {  
          "type":"shell",
@@ -87,6 +104,7 @@
             }
          }
       },
+      
       {  
          "type":"puppet-masterless",
          "execute_command":"{{.FacterVars}}{{if .Sudo}} echo 'vagrant' | sudo -E -S {{end}} puppet apply --verbose --modulepath='{{.ModulePath}}' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
@@ -96,5 +114,6 @@
             "puppet/modules"
          ]
       }
+      
    ]
 }

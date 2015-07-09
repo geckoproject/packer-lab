@@ -1,28 +1,51 @@
 {  
    "push":{  
-      "name":"",
+      "name":"Atlas (AWS/VirtualBox/VMware) build-{{timestamp}}",
       "vcs":false
    },
-   "variables":{  
+   
+   "variables":{
+
+      "_comment": "Please define all variables here as a cleaner way to populate the vm configuration...",   
+      "_comment": "It saves duplication and confusion.",
+   
       "atlas_username":"YOUR-ATLAS-USERNAME",
       "atlas_name":"YOUR-ATLAS-BUILD-NAME",
-      "version":"1.0"
+      
+      "version":"1.0",
+      "vm_cpu": "1",
+      "vm_ram": "1024",
+      "vm_disk": "20480",  
+      
+      "aws_access_key": "YOUR-ACCESS-KEY",
+      "aws_secret_key": "YOUR-SECRET-KEY",
+      "aws_vpc_id": "DEFAULT-VPC-ID",
+      "aws_subnet_id": "SUBNET-ID",
+      "aws_source_ami": "YOUR-AMI-ID",
+      "aws_instance_type": "m1.small",
+      "aws_region": "AWS-REGION",
+      "aws_avail_zone": "SET-REGION-AND-AZ-APPROPRIATELY",
+      "aws_keypair": "AWS-KEYPAIR",
+      "aws_priv_key_file": "PATH-TO-KEY-PAIR",
+      "aws_sg_id": "SG-ID"
+      
    },
+   
    "builders":[  
       {  
          "type":"amazon-ebs",
-         "access_key":"YOUR-ACCESS-KEY",
-         "secret_key":"YOUR-SECRET-KEY",
-         "vpc_id":"DEFAULT-VPC-ID",
-         "subnet_id":"SUBNET-ID",
-         "region":"us-east-1",
-         "source_ami":"ami-dbea24b0",
-         "instance_type":"m1.small",
-         "availability_zone":"us-east-1a",
+         "access_key":"{{user `aws_access_key`}}",
+         "secret_key":"{{user `aws_secret_key`}}",
+         "vpc_id":"{{user `aws_vpc_id`}}",
+         "subnet_id":"{{user `aws_subnet_id`}}",
+         "region":"{{user `aws_region`}}",
+         "source_ami":"{{user `aws_source_ami`}}",
+         "instance_type":"{{user `aws_instance_type`}}",
+         "availability_zone":"{{user `aws_avail_zone`}}",
          "ssh_username":"root",
-         "ssh_keypair_name":"PREDEFINED-KEYPAIR",
-         "ssh_private_key_file":"PATH-TO-KEY-PAIR",
-         "security_group_id":"sg-ID",
+         "ssh_keypair_name":"{{user `aws_keypair`}}",
+         "ssh_private_key_file":"{{user `aws_priv_key_file`}}",
+         "security_group_id":"{{user `aws_sg_id`}}",
          "associate_public_ip_address":true,
          "ami_name":"packer-centos-6.6-x86_64-{{timestamp}}",
          "tags":{  
@@ -37,11 +60,11 @@
          ],
          "headless":false,
          "boot_wait":"10s",
-         "disk_size":20480,
+         "disk_size":"{{user `vm_disk`}}",
          "guest_os_type":"RedHat_64",
          "vboxmanage":[  
-            ["modifyvm", "{{.Name}}", "--memory", "1024"],
-            ["modifyvm", "{{.Name}}", "--cpus", "1"]
+            ["modifyvm", "{{.Name}}", "--memory", "{{user `vm_ram`}}"],
+            ["modifyvm", "{{.Name}}", "--cpus", "{{user `vm_cpu`}}"]
          ],
          "http_directory":"http",
          "iso_checksum":"4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
@@ -55,13 +78,14 @@
          "guest_additions_path":"VBoxGuestAdditions_{{.Version}}.iso",
          "virtualbox_version_file":".vbox_version"
       },
+      
       {  
          "type":"vmware-iso",
          "boot_command":[  
             "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6-x86_64/ks.cfg<enter><wait>"
          ],
          "boot_wait":"10s",
-         "disk_size":20480,
+         "disk_size":"{{user `vm_disk`}}",
          "guest_os_type":"centos-64",
          "headless":false,
          "http_directory":"http",
@@ -76,30 +100,34 @@
          "tools_upload_flavor":"linux",
          "vm_name":"packer-centos-6.6-x86_64",
          "vmx_data":{  
-            "cpuid.coresPerSocket":"1",
-            "memsize":"1024",
-            "numvcpus":"1"
+            "cpuid.coresPerSocket":"{{user `vm_cpu`}}",
+            "memsize":"{{user `vm_ram`}}",
+            "numvcpus":"{{user `vm_cpu`}}"
          }
       }
    ],
+   
    "post-processors":[  
       [  
          {  
             "type":"vagrant",
             "keep_input_artifact":false
          },
+         
          {  
             "type":"atlas",
             "only":[  
                "vmware-iso"
             ],
-            "artifact":"sknight/exbuild",
+            
+            "artifact":"{{user `atlas_username`}}/{{user `atlas_name`}}",
             "artifact_type":"vagrant.box",
             "metadata":{  
                "provider":"vmware_desktop",
                "version":"0.0.1"
             }
          },
+         
          {  
             "type":"atlas",
             "only":[  
@@ -112,6 +140,7 @@
                "version":"0.0.1"
             }
          },
+         
          {  
             "type":"atlas",
             "only":[  
@@ -126,6 +155,7 @@
          }
       ]
    ],
+   
    "provisioners":[  
       {  
          "type":"shell",
@@ -143,6 +173,7 @@
                   "scripts/zerodisk.sh"
                ]
             },
+            
             "vmware-iso":{  
                "execute_command":"echo 'vagrant'|sudo -S bash '{{.Path}}'",
                "scripts":[  
@@ -152,11 +183,13 @@
                   "scripts/zerodisk.sh"
                ]
             },
+            
             "amazon-ebs":{  
                "execute_command":"echo 'vagrant'|sudo -S bash '{{.Path}}'"
             }
          }
       },
+      
       {  
          "type":"puppet-masterless",
          "execute_command":"{{.FacterVars}}{{if .Sudo}} echo 'vagrant' | sudo -E -S {{end}} puppet apply --verbose --modulepath='{{.ModulePath}}' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
@@ -166,5 +199,6 @@
             "puppet/modules"
          ]
       }
+      
    ]
 }

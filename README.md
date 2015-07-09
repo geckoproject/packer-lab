@@ -1,4 +1,4 @@
-# [Packer](http://packer.io) templates for Linux deployments.
+# [Packer](http://packer.io) templates for Linux deployments
 
 ### Table of contents
 
