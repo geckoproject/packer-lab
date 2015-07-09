@@ -50,3 +50,7 @@ In order to deploy artifacts to Atlas, you have to:
 1. The Amazon AMI that you use needs to pre-exist, using a public AMI will typically fail with an error of ""Sudo Error “ you must have a tty to run sudo”"".
 - To fix this issue pre-provision your AMI, run "visudo" as root and comment out the line "Default requiretty".
 2. The key that is specified for the build of Amazon AMI should exist before hand on the AMI. If you choose to use your own key ensure this is so, otherwise the Packer provisioner will generate temp keys whilst building.
+
+##### TODO
+1. Align all VM hardware settings (CPU, RAM, Disk) so that AWS lines up with the VirtualBox/VMware deployments
+2. Generate a public AMI
