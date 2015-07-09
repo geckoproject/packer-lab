@@ -1,6 +1,6 @@
 {  
    "push":{  
-      "name":"Atlas (AWS/VirtualBox/VMware) build-{{timestamp}}",
+      "base_dir": ".",
       "vcs":false
    },
    
@@ -19,15 +19,8 @@
       
       "aws_access_key": "YOUR-ACCESS-KEY",
       "aws_secret_key": "YOUR-SECRET-KEY",
-      "aws_vpc_id": "DEFAULT-VPC-ID",
-      "aws_subnet_id": "SUBNET-ID",
       "aws_source_ami": "YOUR-AMI-ID",
       "aws_instance_type": "m1.small",
-      "aws_region": "AWS-REGION",
-      "aws_avail_zone": "SET-REGION-AND-AZ-APPROPRIATELY",
-      "aws_keypair": "AWS-KEYPAIR",
-      "aws_priv_key_file": "PATH-TO-KEY-PAIR",
-      "aws_sg_id": "SG-ID"
       
    },
    
@@ -36,16 +29,8 @@
          "type":"amazon-ebs",
          "access_key":"{{user `aws_access_key`}}",
          "secret_key":"{{user `aws_secret_key`}}",
-         "vpc_id":"{{user `aws_vpc_id`}}",
-         "subnet_id":"{{user `aws_subnet_id`}}",
-         "region":"{{user `aws_region`}}",
          "source_ami":"{{user `aws_source_ami`}}",
          "instance_type":"{{user `aws_instance_type`}}",
-         "availability_zone":"{{user `aws_avail_zone`}}",
-         "ssh_username":"root",
-         "ssh_keypair_name":"{{user `aws_keypair`}}",
-         "ssh_private_key_file":"{{user `aws_priv_key_file`}}",
-         "security_group_id":"{{user `aws_sg_id`}}",
          "associate_public_ip_address":true,
          "ami_name":"packer-centos-6.6-x86_64-{{timestamp}}",
          "tags":{  
