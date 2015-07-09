@@ -37,8 +37,8 @@
          "associate_public_ip_address":true,
          "ssh_username":"root",
          "region": "{{user `aws_region`}}",
-         "aws_keypair": "{{user `aws_ssh_keypair`}}",
-         "aws_priv_key_file": "{{user `aws_ssh_keyfile`}}",
+         "ssh_keypair_name": "{{user `aws_ssh_keypair`}}",
+         "ssh_private_key_file": "{{user `aws_ssh_keyfile`}}",
          "ami_name":"packer-centos-6.6-x86_64-{{timestamp}}",
          "tags":{  
             "OS_Version":"CentOS",
