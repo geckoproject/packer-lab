@@ -21,6 +21,9 @@
       "aws_secret_key": "YOUR-SECRET-KEY",
       "aws_source_ami": "YOUR-AMI-ID",
       "aws_instance_type": "m1.small",
+      "aws_region": "us-east-1"
+      "aws_ssh_keypair": "SSH-KEYPAIR-ASSIGNED-IN-AWS-CONSOLE",
+      "aws_ssh_keyfile": "PATH-TO-PRIV-KEY-ON-DISK"
       
    },
    
@@ -32,6 +35,10 @@
          "source_ami":"{{user `aws_source_ami`}}",
          "instance_type":"{{user `aws_instance_type`}}",
          "associate_public_ip_address":true,
+         "ssh_username":"root",
+         "region": "{{user `aws_region`}}",
+         "aws_keypair": "{{user `aws_ssh_keypair`}}",
+         "aws_priv_key_file": "{{user `aws_ssh_keyfile`}}",
          "ami_name":"packer-centos-6.6-x86_64-{{timestamp}}",
          "tags":{  
             "OS_Version":"CentOS",
