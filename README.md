@@ -55,3 +55,4 @@ In order to deploy artifacts to Atlas, you have to:
 1. Align all VM hardware settings (CPU, RAM, Disk) so that AWS lines up with the VirtualBox/VMware deployments
 2. Generate a public AMI
 3. Migrate from Puppet to Ansible
+4. Check sanity of files
